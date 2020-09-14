@@ -1,7 +1,7 @@
 version: '3'
 
 networks:
-  laravel:
+  meinteresa:
 
 services:
   site:
@@ -15,26 +15,30 @@ services:
       - ./src:/var/www/html:delegated
     depends_on:
       - php
-      - mysql
+      - mariadb
     networks:
-      - laravel
+      - meinteresa
 
-  mysql:
-    image: mysql:5.7.29
-    container_name: mysql
-    restart: unless-stopped
+  mariadb:
+    image: mariadb:10.2
+    container_name: mariadb
     tty: true
     ports:
-      - "3306:3306"
+      - "13306:3306"
     environment:
-      MYSQL_DATABASE: homestead
-      MYSQL_USER: homestead
-      MYSQL_PASSWORD: secret
-      MYSQL_ROOT_PASSWORD: secret
-      SERVICE_TAGS: dev
-      SERVICE_NAME: mysql
+      MYSQL_ROOT_PASSWORD: qwerty
+      MYSQL_DATABASE: meinteresa
+      MYSQL_USER: meinteresa
+      MYSQL_PASSWORD: qwerty
+#    logging:
+#      driver: syslog
+#      options:
+#        tag: "{{.DaemonName}}(image={{.ImageName}};name={{.Name}};id={{.ID}})"
     networks:
-      - laravel
+      - meinteresa
+    restart: unless-stopped
+    volumes:
+      - ./database-files:/var/lib/mysql
 
   php:
     build:
@@ -46,7 +50,7 @@ services:
     ports:
       - "9000:9000"
     networks:
-      - laravel
+      - meinteresa
 
   composer:
     build:
@@ -58,18 +62,17 @@ services:
     working_dir: /var/www/html
     depends_on:
       - php
-    user: laravel
+    user: meinteresa
     networks:
-      - laravel
-    entrypoint: ['composer', '--ignore-platform-reqs']
+      - meinteresa
 
-  npm:
-    image: node:13.7
-    container_name: npm
-    volumes:
-      - ./src:/var/www/html
-    working_dir: /var/www/html
-    entrypoint: ['npm']
+#  npm:
+#    image: node:13.7
+#    container_name: npm
+#    volumes:
+#      - ./src:/var/www/html
+#    working_dir: /var/www/html
+#    entrypoint: ['npm']
 
   artisan:
     build:
@@ -79,9 +82,9 @@ services:
     volumes:
       - ./src:/var/www/html:delegated
     depends_on:
-      - mysql
+      - mariadb
     working_dir: /var/www/html
     user: laravel
     entrypoint: ['php', '/var/www/html/artisan']
     networks:
-      - laravel
+      - meinteresa
