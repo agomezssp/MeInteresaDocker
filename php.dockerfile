@@ -9,7 +9,7 @@ RUN apt-get update && apt-get install -y \
 
 ADD ./php/www.conf /usr/local/etc/php-fpm.d/www.conf
 
-RUN addgroup -g 1000 laravel && adduser -G laravel -g laravel -s /bin/sh -D laravel
+RUN addgroup --gid 1000 laravel && adduser --gid 1000 --shell /bin/sh --disabled-password --no-create-home laravel
 
 RUN mkdir -p /var/www/html
 
